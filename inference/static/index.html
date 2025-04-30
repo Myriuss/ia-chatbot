@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot Sport LoRA</title>
+</head>
+<body>
+  <h2>Pose une question sur le sport 🏋️‍♀️</h2>
+  <input type="text" id="prompt" placeholder="Ex: How important is sleep for athletes?" style="width:300px;">
+  <button onclick="sendPrompt()">Envoyer</button>
+  <p><strong>Réponse :</strong></p>
+  <div id="response" style="white-space: pre-line;"></div>
+
+  <script>
+    async function sendPrompt() {
+      const prompt = document.getElementById("prompt").value;
+      const res = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      document.getElementById("response").innerText = data.response || "(aucune réponse)";
+    }
+  </script>
+</body>
+</html>
