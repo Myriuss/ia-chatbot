@@ -1,105 +1,90 @@
-# 🏋️‍♀️ SportBot — Fine-tuned Chatbot using LoRA & GPT-2
+# 🏋️‍♀️ SportBot — Fine-tuned Chatbot using LoRA, FastAPI, Docker & Kubernetes
 
-This project implements a lightweight, domain-specific chatbot focused on **sports and fitness**, built by fine-tuning `distilgpt2` with **LoRA (Low-Rank Adaptation)** and deploying it via a **FastAPI** web service. It also includes a simple web interface to test the chatbot.
-
----
-
-## Features
-
--  Fine-tuning of `distilgpt2` with LoRA using PEFT
--  Custom sport/fitness Q&A dataset
--  Exposed API via FastAPI
--  Simple HTML frontend to ask questions
--  Fully containerized (Docker)
+Un projet complet d'IA embarquant un modèle de langage léger (`distilgpt2`) fine-tuné via **LoRA**, déployé via **FastAPI**, conteneurisé avec **Docker**, et orchestré avec **Kubernetes (kind)**.
 
 ---
 
-##  Project structure
+##  Objectif
+
+Fournir un chatbot thématique sur le sport, capable de :
+
+- Être fine-tuné via des données personnalisées
+- Servir les réponses via une API REST
+- S'adapter à la demande grâce à une architecture scalable
+
+---
+
+##  Stack technique
+
+| Composant       | Tech utilisée             |
+|------------------|----------------------------|
+| 📘 Modèle         | `distilgpt2` + LoRA via `peft` |
+| 🏋️ Dataset        | Fichier JSON Q&R sportives |
+| 🔧 Entraînement   | Script Python (`train.py`) |
+| 🧠 Inférence      | FastAPI + Transformers     |
+| 🐳 Conteneurisation | Docker                    |
+| ☸️ Orchestration   | Kubernetes avec `kind`     |
+| 🌐 Frontend       | Interface HTML minimaliste |
+
+---
+
+##  Structure du projet
 
 ```
-project/
+TROPHENIX_Exercice/
 ├── training/
 │   ├── train.py
-│   ├── sport_qa.json        # Dataset: 30 sport-related Q&As (EN)
-│   └── lora-model/          # Fine-tuned model output
+│   ├── sport_qa.json
 ├── inference/
-│   ├── app.py               # FastAPI app
-│   ├── Dockerfile
-│   ├── static/
-│   │   └── index.html       # Web UI
-├── docker-compose.yml       # (optional)
+│   ├── app.py
+│   ├── lora-model/           # modèle fine-tuné
+│   ├── static/index.html
+├── k8s/                      # Fichiers YAML Kubernetes
+│   ├── lora-api-deployment.yaml
+│   ├── lora-api-service.yaml
+│   └── lora-train-job.yaml
+├── deploy.sh                 # Script de build + apply + port-forward
 └── README.md
 ```
 
 ---
 
-##  Requirements
-
-- Docker + Colima (on macOS)
-- ~5 GB free disk space
-
----
-
-##  1. Fine-tune the model
+##  Lancer le projet (en une commande)
 
 ```bash
-cd training
-docker build -t lora-train .
-docker run --rm -v $(pwd)/lora-model:/app/lora-model lora-train
+bash deploy.sh
 ```
 
-➡ Model saved in `training/lora-model/`
+Ce script :
+- build les containers `lora-api` et `lora-train`
+- les charge dans le cluster `kind`
+- déploie les manifests K8s
+- effectue un `port-forward` local
+- lance l’application sur [http://localhost:8000](http://localhost:8000)
 
 ---
 
-##  2. Launch the API
+##  Pour re-fine-tuner le modèle (à la demande)
 
 ```bash
-cp -r training/lora-model inference/
-cd inference
-docker build -t lora-api .
-docker run -p 8001:8000 lora-api
-```
-
- Open in browser: [http://localhost:8000(http://localhost:8000)
-
----
-
-##  3. Test via cURL
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "How can I build muscle quickly?"}'
+kubectl apply -f k8s/lora-train-job.yaml
 ```
 
 ---
 
-##  Dataset format
+##  Fonctionnalités
 
-`training/sport_qa.json`:
-```json
-[
-  {
-    "prompt": "What are the best exercises for abs?",
-    "response": "Crunches, leg raises, planks, and mountain climbers are very effective."
-  },
-  ...
-]
-```
+- Chatbot sport via FastAPI + LoRA
+- Interface HTML simple
+- Entraînement personnalisé
+- Orchestration Kubernetes (kind)
+- Prêt à déployer dans un cluster réel
 
 ---
 
-##  (Optional) Run with docker-compose
+## 👩‍💻 Réalisé par **Mariam**
 
-```bash
-docker-compose build
-docker-compose up
-```
+Projet d'entraînement à l'ingénierie IA et MLOps pour un test.
 
 ---
 
-## 👩‍💻 Built by Mariam
-
-Apprentice Software Engineer passionate about AI & MLOps  
-Fine-tuning LoRA + API + interface web made with 💪 & ☕  
