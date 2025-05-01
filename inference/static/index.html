@@ -1,27 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chatbot Sport LoRA</title>
+  <title>SportBot 🏋️‍♀️</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <h2>Pose une question sur le sport 🏋️‍♀️</h2>
-  <input type="text" id="prompt" placeholder="Ex: How important is sleep for athletes?" style="width:300px;">
-  <button onclick="sendPrompt()">Envoyer</button>
-  <p><strong>Réponse :</strong></p>
-  <div id="response" style="white-space: pre-line;"></div>
+  <div class="chat-container">
+    <header>
+      <h1>SportBot 🏋️‍♀️</h1>
+    </header>
+    <main id="chat-box"></main>
+    <footer class="chat-input">
+      <input type="text" id="user-input" placeholder="Pose ta question..." />
+      <button onclick="sendMessage()">Envoyer</button>
+    </footer>
 
-  <script>
-    async function sendPrompt() {
-      const prompt = document.getElementById("prompt").value;
-      const res = await fetch("/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt })
-      });
-      const data = await res.json();
-      document.getElementById("response").innerText = data.response || "(aucune réponse)";
-    }
-  </script>
+  </div>
+  <script src="/static/script.js"></script>
 </body>
 </html>

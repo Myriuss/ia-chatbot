@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lora-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lora-api
+  template:
+    metadata:
+      labels:
+        app: lora-api
+    spec:
+      containers:
+        - name: lora-api
+          image: lora-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
