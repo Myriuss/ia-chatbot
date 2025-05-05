@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./inference
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./training/lora-model:/app/lora-model

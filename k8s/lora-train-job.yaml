@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lora-train
+spec:
+  template:
+    spec:
+      containers:
+        - name: lora-train
+          image: lora-train:latest
+          imagePullPolicy: Never
+          command: ["python"]
+          args: ["train.py"]
+          volumeMounts:
+            - name: model-volume
+              mountPath: /app/lora-model
+      restartPolicy: Never
+      volumes:
+        - name: model-volume
+          emptyDir: {}
