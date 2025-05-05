@@ -71,7 +71,9 @@ Ce script :
 - créer un cluster et les charge dans le cluster `kind`
 - déploie les manifests K8s
 - effectue un `port-forward` local
-- après on peut lancer l’application sur [http://localhost:8000](http://localhost:8000)
+- après on peut lancer l’application sur [http://localhost:8000](http://localhost:8000) avec kubectl port-forward deployment/lora-api 8000:8000
+
+![Aperçu du chatbot](demo.png)
 
 ---
 
