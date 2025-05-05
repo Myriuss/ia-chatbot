@@ -55,7 +55,7 @@ TROPHENIX_Exercice/
 │   └── components.yaml              # Metrics Server (HPA)
 │
 ├── deploy.sh               # Script pour build et déployer toute l’app
-└── README.md               # Ce fichier
+└── README.md               
 ```
 
 ---
@@ -71,7 +71,7 @@ Ce script :
 - créer un cluster et les charge dans le cluster `kind`
 - déploie les manifests K8s
 - effectue un `port-forward` local
-- lance l’application sur [http://localhost:8000](http://localhost:8000)
+- après on peut lancer l’application sur [http://localhost:8000](http://localhost:8000)
 
 ---
 

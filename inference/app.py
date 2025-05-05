@@ -8,21 +8,23 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
-# 📦 Charger le modèle fine-tuné avec LoRA
+#charger le modèle fine-tuné avec LoRA
 base_model_name = "distilgpt2"
 model_path = "./lora-model"
 
-base_model = AutoModelForCausalLM.from_pretrained(base_model_name)
-tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+base_model = AutoModelForCausalLM.from_pretrained(base_model_name) #chargement du modèle de base
+tokenizer = AutoTokenizer.from_pretrained(base_model_name) #chargement du tokenizer associé
 
+#application de la configuration LoRA au modèle de base
 model = PeftModel.from_pretrained(base_model, model_path)
-model.eval()
+model.eval()#mode évaluation, désactive dropout etcccc
 
-# ✅ Fix pad token si nécessaire
+## configuration du token de padding
 tokenizer.pad_token = tokenizer.eos_token
 model.config.pad_token_id = tokenizer.pad_token_id
 
-# 📌 Pipeline avec paramètres affinés
+#création d’un pipeline Hugging Face pour la génération de texte
+#le pipeline est configuré pour utiliser le GPU si disponible, sinon le CPU
 device = 0 if torch.cuda.is_available() else -1
 generator = pipeline(
     "text-generation",
@@ -31,33 +33,39 @@ generator = pipeline(
     device=device,
 )
 
-# 🎯 Format des requêtes
+#Format des requêtes
 class Query(BaseModel):
-    prompt: str
+    prompt: str #une seule clé "prompt" de type string
 
+#definition de la route POST /predict
+#cette route reçoit une requête JSON contenant un prompt, génère une réponse et la retourne
 @app.post("/predict")
 def predict(query: Query):
+    #format d’entrée pour le modèle
     input_text = f"Q: {query.prompt.strip()}\nA:"
     try:
+        #génération du texte avec plusieurs paramètres pour contrôler la créativité
         output = generator(
             input_text,
-            max_new_tokens=60,
-            do_sample=True,
-            top_p=0.9,
-            temperature=0.5,
-            repetition_penalty=1.3,
-            eos_token_id=tokenizer.eos_token_id,
+            max_new_tokens=60, #limite de tokens générés
+            do_sample=True, #activation de l’échantillonnage
+            top_p=0.9,#nucleus sampling
+            temperature=0.5,#contrôle de la diversité
+            repetition_penalty=1.3,#pénalise les répétitions
+            eos_token_id=tokenizer.eos_token_id,#token de fin
         )
+        #extraction de la reponse textuelle aprss le préfixe "A:"
         generated_text = output[0]["generated_text"]
         answer = generated_text.split("A:")[-1].strip()
     except Exception as e:
-        answer = f"❌ Error generating response: {e}"
-
+        #voir si jamais ça echoue
+        answer = f"❌ !!! Error generating response: {e}"
+    #reponse renvoyée sous forme de dictionnaire JSON
     return {"response": answer}
 
-# 🌐 Interface web
+#interface web
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/")
+#route GET pour la page d’accueil
 def root():
     return FileResponse("static/index.html")
